@@ -2839,9 +2839,9 @@ bool MainWindow::importMesh(QString fileName,bool isareload)
             pCurrentIOPlugin->initOpenParameter(extension, *mm, par);
             if(!par.isEmpty())
             {
-                GenericParamDialog postOpenDialog(this, &par, tr("Post-Open Processing"));
-                postOpenDialog.setFocus();
-                postOpenDialog.exec();
+                //GenericParamDialog postOpenDialog(this, &par, tr("Post-Open Processing"));
+                //postOpenDialog.setFocus();
+                //postOpenDialog.exec();
                 pCurrentIOPlugin->applyOpenParameter(extension, *mm, par);
             }
             /*MultiViewer_Container* mv = GLA()->mvc();

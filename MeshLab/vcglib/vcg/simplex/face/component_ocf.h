@@ -27,7 +27,7 @@
 #endif
 
 namespace vcg {
-  namespace face {
+namespace face {
 /*
 All the Components that can be added to a faceex should be defined in the namespace face:
 
@@ -36,7 +36,7 @@ All the Components that can be added to a faceex should be defined in the namesp
 template <class VALUE_TYPE>
 class vector_ocf: public std::vector<VALUE_TYPE> {
   typedef std::vector<VALUE_TYPE> BaseType;
-    typedef typename vector_ocf<VALUE_TYPE>::iterator ThisTypeIterator;
+  typedef typename vector_ocf<VALUE_TYPE>::iterator ThisTypeIterator;
 
 public:
   vector_ocf():std::vector<VALUE_TYPE>()

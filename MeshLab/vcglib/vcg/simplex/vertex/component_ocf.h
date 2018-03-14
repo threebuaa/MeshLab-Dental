@@ -234,7 +234,7 @@ void DisableTexCoord() {
 
 struct VFAdjType {
 	VFAdjType():_fp(0),_zp(-1) {}
-  VFAdjType(typename VALUE_TYPE::FacePointer fp, int zp):_fp(fp),_zp(zp){}
+    VFAdjType(typename VALUE_TYPE::FacePointer fp, int zp):_fp(fp),_zp(zp){}
     typename VALUE_TYPE::FacePointer _fp ;
     int _zp ;
     static VFAdjType Zero() { return VFAdjType(0,-1); }
@@ -562,7 +562,7 @@ public:
         assert(0); return *this;
     }
 
-        vector_ocf<typename T::VertexType> &Base() const { return *_ovp;}
+    vector_ocf<typename T::VertexType> &Base() const { return *_ovp;}
 
     inline int Index() const {
         typename  T::VertexType const *tp=static_cast<typename T::VertexType const*>(this);
