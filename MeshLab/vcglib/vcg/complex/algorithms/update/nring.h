@@ -25,8 +25,7 @@
 
 #include <vcg/simplex/face/jumping_pos.h>
 #include <vcg/complex/algorithms/update/flag.h>
-//#include <vector>
-//#include <common/interfaces.h>
+
 namespace vcg
 {
     namespace tri
