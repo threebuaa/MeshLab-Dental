@@ -122,7 +122,7 @@ bool BaseMeshIOPlugin::open(const QString &formatName, const QString &fileName, 
       errorMessage = errorMsgFormat.arg(fileName, tri::io::ImporterSTL<CMeshO>::ErrorMsg(tri::io::ImporterSTL<CMeshO>::E_CANTOPEN));
       return false;
     }
-    m.Enable(mask);
+    m.Enable(mask|tri::io::Mask::IOM_VERTCOLOR);
     int result = tri::io::ImporterSTL<CMeshO>::Open(m.cm, filename.c_str(), mask, cb);
     if (result != 0) // all the importers return 0 on success
     {

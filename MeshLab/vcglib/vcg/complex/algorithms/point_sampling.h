@@ -590,12 +590,12 @@ static int  PoissonRatioUniforms(double L) {
 /**
   algorithm poisson random number (Knuth):
     init:
-         Let L â† e^âˆ’Î», k â† 0 and p â† 1.
+         Let L ¡û e^?¦Ë, k ¡û 0 and p ¡û 1.
     do:
-         k â† k + 1.
-         Generate uniform random number u in [0,1] and let p â† p Ã— u.
+         k ¡û k + 1.
+         Generate uniform random number u in [0,1] and let p ¡û p ¡Á u.
     while p > L.
-    return k âˆ’ 1.
+    return k ? 1.
 
   */
 static int Poisson(double lambda)

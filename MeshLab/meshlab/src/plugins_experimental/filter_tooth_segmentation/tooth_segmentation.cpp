@@ -104,7 +104,7 @@ void ToothSegmentationPlugin::initParameterSet(QAction * action, MeshModel & m, 
 		parlst.addParam(new RichFloat("ThresholdValue",
 			0.45f,
 			"Threshold of Curvature",
-			"Initial feature region according mean curvature."));
+			"Initial feature region according min curvature."));
 		parlst.addParam(new RichFloat("MaxDist",
 			3.5f,
 			"Max Neighborhood Dist",
@@ -154,12 +154,10 @@ bool ToothSegmentationPlugin::applyFilter(QAction * filter, MeshDocument & md, R
 		vcg::tri::UpdateNormal<CMeshO>::NormalizePerVertex(m.cm);
 		vcg::tri::UpdateCurvatureFitting<CMeshO>::computeCurvature(m.cm);	//k1k2曲率估算				
 		vcg::tri::UpdateQuality<CMeshO>::VertexFromMeanCurvatureDir(m.cm);  //平均曲率计算并放入容器
-				
-		
-		// 根据曲率阈值筛选区域
-		if ( CurvGroup(m, par) == false)
-			return false;
+		//vcg::tri::UpdateQuality<CMeshO>::VertexFromAbsoluteCurvature(m.cm);
+		//vcg::tri::UpdateQuality<CMeshO>::VertexFromMyCurvatureDir(m.cm);
 
+		
 		// 初始化各个标识
 		CMeshO::VertexIterator vi;
 		for (vi = m.cm.vert.begin(); vi != m.cm.vert.end(); ++vi) 
@@ -177,22 +175,27 @@ bool ToothSegmentationPlugin::applyFilter(QAction * filter, MeshDocument & md, R
 
 			curvature[vi] = (*vi).Q();
 		}
+
+		// 根据曲率阈值筛选区域
+		if (CurvGroup(m, par) == false)
+			return false;
+
 		for (vector<CMeshO::VertexPointer>::iterator iterFP = FeaturePoints.begin();
 			iterFP != FeaturePoints.end(); ++iterFP)
 		{
 			// feature region, less than defined min curvature
  			setVFB[(*iterFP)] = 'F';
-		}		
+		}
 		
 		FilterNoise(m, 0.01);
 				
 		// morphologic operation
-		meshDilate(m, 2);		
-		meshErode(m, 1);		
-		meshSkeletonize(m);		
+		meshDilate(m, 2);
+		meshErode(m, 3);
+/*		meshSkeletonize(m);
 		meshPrune(m, 4);  // 进行 4 次减除操作
 
-		FilterNoise(m, 0.02);		
+		FilterNoise(m, 0.02);
 		
 		vector<CVertexO*> ConnectPoints = FindConnectPoints(m);
 		vector<CMeshO::VertexPointer> MiddlePoints = FindMidPoints(m, par, ConnectPoints);
@@ -200,9 +203,9 @@ bool ToothSegmentationPlugin::applyFilter(QAction * filter, MeshDocument & md, R
 		AddPathtoConnect(m, MiddlePoints);
 		showSegments1st(m);
 		RemoveLines(m);
-
+		//FilterNoise(m, 0.05);
 		//SaveAsSTL(m);
-		
+		*/
 		ShowFeature(m);
 
 		/*
@@ -344,7 +347,7 @@ void ToothSegmentationPlugin::ShowFeature(MeshModel &m)
 	for (CMeshO::VertexIterator vi = m.cm.vert.begin(); vi != m.cm.vert.end(); ++vi) {
 		if (setVFB[vi] == 'F')
 		{
-			(*vi).C() = vcg::Color4b::Red;			
+			(*vi).C() = vcg::Color4b::Red;
 		}
 	}
 }
@@ -707,7 +710,7 @@ void ToothSegmentationPlugin::showSegments1st(MeshModel &m)
 		}
 	}
 
-	//////////////////////////////////////////////////////////////
+	/*
 	// ***** For each set, sum the positive curvature and store in new vector
 	vector<float> vectorOfSetPosCurvatureSums(vectorOfDisjointSetsWithVertices.size(), 0);
 	for (int pos = 0; pos < vectorOfDisjointSetsWithVertices.size(); pos++)
@@ -723,7 +726,7 @@ void ToothSegmentationPlugin::showSegments1st(MeshModel &m)
 		}
 		vectorOfSetPosCurvatureSums[pos] = tempSumOfCurvature;
 	}   // 这部分把每个区域顶点的曲率值为正的总和存起来,
-
+*/
 		// ***** Find the set with the most vertices
 	int maxInSet = 0;
 	int maxOffset = 0;
@@ -738,6 +741,7 @@ void ToothSegmentationPlugin::showSegments1st(MeshModel &m)
 			maxOffset = pos;
 		}
 	}
+	/*
 	int numBigSets = 0;
 	int numLittleSets = 0;
 	for (int pos = 0; pos < vectorOfDisjointSetsWithVertices.size(); pos++)
@@ -751,7 +755,7 @@ void ToothSegmentationPlugin::showSegments1st(MeshModel &m)
 			}
 		}
 	}
-
+*/
 	// ***** color the different sets
 	for (vi = m.cm.vert.begin(); vi != m.cm.vert.end(); ++vi) {
 		if (setVFB[vi] == 'F') {
@@ -1181,7 +1185,7 @@ void ToothSegmentationPlugin::RemoveLines(MeshModel &m)
 			//delete it from feature
 			if (colorCounter == 2 || colorCounter == 1) {
 				if (colorCounter == 2) {
-					if (color1 != whiteColor && color2 != whiteColor) {
+					if (color1 != whiteColor || color2 != whiteColor) {
 						//delete from feature if surrounded by a color besides white
 						setVFB[vi] = 'V';
 						if (color1 != blueColor) {

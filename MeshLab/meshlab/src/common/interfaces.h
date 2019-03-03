@@ -246,7 +246,11 @@ public:
 		Measure = 0x10000,  /*!<  Filters that compute measures and information on meshes.*/
 		Polygonal = 0x20000,   /*!<  Filters that works on polygonal and quad meshes.*/
 		Camera = 0x40000,         /*!<  Filters that works on shot of mesh and raster.*/
-		Denture = 0x80000
+		RPDSelection= 0x80000,	/*!<  Filters that works on dental anatomical information extraction.*/
+		RPDGL = 0x100000,
+		RPDAOL = 0x200000,
+		RPDOR = 0x400000,
+		RPDDebug = 0x800000
 	};
 
 

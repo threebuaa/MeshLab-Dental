@@ -267,8 +267,8 @@ public:
 //template<>	void EnableAttribute<typename VALUE_TYPE::NormalType>(){	NormalEnabled=true;}
 
 /*------------------------- COORD -----------------------------------------*/
-/*----------------------------- VFADJ ------------------------------*/
 
+///*----------------------------- VFADJ ------------------------------*/
 
 template <class T> class VFAdjOcf: public T {
 public:
@@ -303,7 +303,7 @@ public:
 private:
 };
 
-/*------------------------- Normal -----------------------------------------*/
+///*------------------------- Normal -----------------------------------------*/
 
 template <class A, class T> class NormalOcf: public T {
 public:

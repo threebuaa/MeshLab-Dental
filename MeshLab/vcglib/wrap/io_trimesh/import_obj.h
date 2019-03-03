@@ -262,7 +262,7 @@ namespace vcg {
                     std::string	header;
 
                     short currentMaterialIdx = 0;			// index of current material into materials vector
-                    Color4b currentColor=Color4b::LightGray;	// we declare this outside code block since other
+                    Color4b currentColor=Color4b::White;	// we declare this outside code block since other
                     // triangles of this face will share the same color
 
                     Material defaultMaterial;					// default material: white

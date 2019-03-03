@@ -44,13 +44,13 @@ namespace vcg
     struct DisjointSetNode
     {
       DisjointSetNode(OBJECT_TYPE *x) {obj=x; parent=obj; rank=0;}
-      OBJECT_TYPE	*obj;
+      OBJECT_TYPE *obj;
       OBJECT_TYPE *parent;
-      int					 rank;
+      int rank;
     };
 
-    typedef OBJECT_TYPE*																							ObjectPointer;
-    typedef std::pair< ObjectPointer, int >														hPair;
+    typedef OBJECT_TYPE* ObjectPointer;
+    typedef std::pair< ObjectPointer, int >	hPair;
 
     struct SimpleObjHashFunc{
       inline	size_t	operator ()(const ObjectPointer &p) const {return size_t(p);}
@@ -59,7 +59,7 @@ namespace vcg
     std::unordered_map< OBJECT_TYPE*, int > inserted_objects;
     typedef typename std::unordered_map< OBJECT_TYPE*, int >::iterator	hIterator;
 
-    typedef std::pair< hIterator, bool >															hInsertResult;
+    typedef std::pair< hIterator, bool > hInsertResult;
 
 
   public:
@@ -123,7 +123,7 @@ namespace vcg
     }
 
   protected:
-    std::vector< DisjointSetNode >				nodes;
+    std::vector< DisjointSetNode >nodes;
   };
 };// end of namespace vcg
 

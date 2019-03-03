@@ -73,8 +73,12 @@ public:
 		MODIFIED   = 0x0008,		// This bit indicate that the vertex is modified
 		VISITED    = 0x0010,		// This bit can be used to mark the visited vertex
 		SELECTED   = 0x0020,		// This bit can be used to select 
-		BORDER     = 0x0100,    // Border Flag
-		USER0      = 0x0200			// First user bit
+		BORDER     = 0x0100,		// Border Flag
+		///added for rpd in 20180827
+		GL		   = 0x0200,
+		AOL        = 0x0400,
+		OR         = 0x0800,///by wang
+		USER0      = 0x1000			// First user bit
   };
  	
     bool IsD() const {return (this->cFlags() & DELETED) != 0;} ///  checks if the vertex is deleted
@@ -84,8 +88,11 @@ public:
     bool IsS() const {return (this->cFlags() & SELECTED) != 0;}///  checks if the vertex is Selected
     bool IsB() const {return (this->cFlags() & BORDER) != 0;}///  checks if the vertex is a border one
     bool IsV() const {return (this->cFlags() & VISITED) != 0;}///  checks if the vertex Has been visited
-	
-
+	///added for rpd in 20180827
+	bool IsGL() const { return (this->cFlags() & GL) != 0; }///  checks if the vertex is on GL
+	bool IsAOL() const { return (this->cFlags() & AOL) != 0; }///  checks if the vertex is on AOL
+	bool IsOR() const { return (this->cFlags() & OR) != 0; }///  checks if the vertex is on OR
+	///by wang
 	/** Set the flag value
 		@param flagp Valore da inserire nel flag
 	*/
@@ -107,7 +114,13 @@ public:
 	void ClearB()	{this->Flags() &=~BORDER;}
 	void SetV()		{this->Flags() |=VISITED;}
 	void ClearV()	{this->Flags() &=~VISITED;}
-	
+	///added for rpd in 20180827
+	void SetGL() { this->Flags() |= GL; }
+	void ClearGL() { this->Flags() &= ~GL; }
+	void SetAOL() { this->Flags() |= AOL; }
+	void ClearAOL() { this->Flags() &= ~AOL; }
+	void SetOR() { this->Flags() |= OR; }
+	void ClearOR() { this->Flags() &= ~OR; }///by wang
 	///  Return the first bit that is not still used
 	static int &FirstUnusedBitFlag()
 	{

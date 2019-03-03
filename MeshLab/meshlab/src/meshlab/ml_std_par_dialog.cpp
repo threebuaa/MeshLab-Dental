@@ -121,7 +121,7 @@ void MeshlabStdDialog::loadFrameContent(MeshDocument *mdPt)
 	QGridLayout *gridLayout = new QGridLayout(qf);
 
 	setWindowTitle(curmfi->filterName(curAction));
-	QLabel *ql = new QLabel("<i>" + curmfi->filterInfo(curAction) + "</i>", qf);
+	QLabel *ql = new QLabel(curmfi->filterInfo(curAction), qf);
 	ql->setTextFormat(Qt::RichText);
 	ql->setWordWrap(true);
 	gridLayout->addWidget(ql, 0, 0, 1, 2, Qt::AlignTop); // this widgets spans over two columns.

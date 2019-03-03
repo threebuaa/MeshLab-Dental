@@ -585,18 +585,23 @@ void MainWindow::createMenus()
 	//////////////////// Menu Edit //////////////////////////////////////////////////////////////////////////
 	editMenu = menuBar()->addMenu(tr("&Edit"));
 	editMenu->addAction(suspendEditModeAct);
+	fillEditMenu();
 
 	//////////////////// Menu Filter //////////////////////////////////////////////////////////////////////////
-	filterMenu = menuBar()->addMenu(tr("Fi&lters"));
+	filterMenu = menuBar()->addMenu(tr("&Filters"));
 	fillFilterMenu();
 
 	//////////////////// Menu Render //////////////////////////////////////////////////////////////////////////
 	renderMenu = menuBar()->addMenu(tr("&Render"));
-
 	// Shaders SUBmenu
 	shadersMenu = renderMenu->addMenu(tr("&Shaders"));
 	renderMenu->addSeparator();
 
+	fillRenderMenu();
+	//////////////////// Menu Removable partial denture //////////////////////////////////////////////////////////////////////////
+	RPDMenu = menuBar()->addMenu(tr("&RPD"));
+	fillRPDMenu();	
+	
 	//////////////////// Menu View ////////////////////////////////////////////////////////////////////////////
 	viewMenu = menuBar()->addMenu(tr("&View"));
 	viewMenu->addAction(fullScreenAct);
@@ -635,8 +640,8 @@ void MainWindow::createMenus()
 	helpMenu->addAction(submitBugAct);
 	helpMenu->addAction(checkUpdatesAct);
 
-	fillEditMenu();
-	fillRenderMenu();
+	
+	
 	fillDecorateMenu();
 
 	//////////////////// Menu Split/Unsplit from handle
@@ -734,9 +739,7 @@ void MainWindow::fillFilterMenu()
 	filterMenuTexture = new MenuWithToolTip(tr("Texture"), this);
 	filterMenu->addMenu(filterMenuTexture);
 	filterMenuCamera = new MenuWithToolTip(tr("Camera"), this);
-	filterMenu->addMenu(filterMenuCamera);
-	filterMenuDenture = new MenuWithToolTip(tr("Deture Repair"), this);
-	filterMenu->addMenu(filterMenuDenture);
+	filterMenu->addMenu(filterMenuCamera);	
 
 	QMap<QString, MeshFilterInterface *>::iterator msi;
 	for (msi = PM.stringFilterMap.begin(); msi != PM.stringFilterMap.end(); ++msi)
@@ -824,11 +827,7 @@ void MainWindow::fillFilterMenu()
 		if (filterClass & MeshFilterInterface::Camera)
 		{
 			filterMenuCamera->addAction(filterAction);
-		}
-		if (filterClass & MeshFilterInterface::Denture)
-		{
-			filterMenuDenture->addAction(filterAction);
-		}
+		}		
 		//  MeshFilterInterface::Generic :
 		if (filterClass == 0)
 		{
@@ -932,11 +931,126 @@ void MainWindow::fillFilterMenu()
 				if (nameClass == QString("Camera"))
 				{
 					filterMenuCamera->addAction(filterAction);
-				}
-				if (nameClass == QString("Denture Repair"))
+				}				
+				//  //  MeshFilterInterface::Generic :
+				if (nameClass == QString("Generic"))
 				{
-					filterMenuDenture->addAction(filterAction);
+					filterMenu->addAction(filterAction);
 				}
+				//if(!filterAction->icon().isNull())
+				//    filterToolBar->addAction(filterAction);
+			}
+		}
+		catch (ParsingException e)
+		{
+			meshDoc()->Log.Logf(GLLogStream::SYSTEM, e.what());
+		}
+	}
+}
+
+void MainWindow::fillRPDMenu()
+{	
+	//RPDMenu->clear();
+	// Connects the events of the actions within colorize to the method which shows their tooltip
+
+	RPDMenuSelect = new MenuWithToolTip(tr("RPD Selection"), this);
+	RPDMenu->addMenu(RPDMenuSelect);
+	RPDMenu->addSeparator();
+	RPDMenuGL = new MenuWithToolTip(tr("Gingival Line"), this);
+	RPDMenu->addMenu(RPDMenuGL); 
+	RPDMenuAOL = new MenuWithToolTip(tr("Abutment Observation Line"), this);
+	RPDMenu->addMenu(RPDMenuAOL);
+	RPDMenuOR = new MenuWithToolTip(tr("Occlusal Rest"), this);
+	RPDMenu->addMenu(RPDMenuOR);
+	RPDMenu->addSeparator();
+	RPDMenuDebug = new MenuWithToolTip(tr("RPD Debug"), this);
+	RPDMenu->addMenu(RPDMenuDebug);
+
+	QMap<QString, MeshFilterInterface *>::iterator msi;
+	for (msi = PM.stringFilterMap.begin(); msi != PM.stringFilterMap.end(); ++msi)
+	{
+		MeshFilterInterface * iFilter = msi.value();
+		QAction *filterAction = iFilter->AC((msi.key()));
+		QString tooltip = iFilter->filterInfo(filterAction) + "<br>" + getDecoratedFileName(filterAction->data().toString());
+		filterAction->setToolTip(tooltip);
+		//connect(filterAction, SIGNAL(hovered()), this, SLOT(showActionMenuTooltip()) );
+		connect(filterAction, SIGNAL(triggered()), this, SLOT(startFilter()));
+
+		int filterClass = iFilter->getClass(filterAction);
+		if (filterClass & MeshFilterInterface::RPDSelection)
+		{
+			RPDMenuSelect->addAction(filterAction);
+		}
+		if (filterClass & MeshFilterInterface::RPDGL)
+		{
+			RPDMenuGL->addAction(filterAction);
+		}
+		if (filterClass & MeshFilterInterface::RPDAOL)
+		{
+			RPDMenuAOL->addAction(filterAction);
+		}
+		if (filterClass & MeshFilterInterface::RPDOR)
+		{
+			RPDMenuOR->addAction(filterAction);
+		}
+		if (filterClass & MeshFilterInterface::RPDDebug)
+		{
+			RPDMenuDebug->addAction(filterAction);
+		}
+		
+		//  MeshFilterInterface::Generic :
+		if (filterClass == 0)
+		{
+			filterMenu->addAction(filterAction);
+		}
+		//if(!filterAction->icon().isNull())
+		//    filterToolBar->addAction(filterAction);
+
+
+	}
+
+	QMap<QString, MeshLabXMLFilterContainer>::iterator xmlit;
+	for (xmlit = PM.stringXMLFilterMap.begin(); xmlit != PM.stringXMLFilterMap.end(); ++xmlit)
+	{
+		try
+		{
+			//MeshLabFilterInterface * iFilter= xmlit.value().filterInterface;
+			QAction *filterAction = xmlit.value().act;
+			if (filterAction == NULL)
+				throw MLException("Invalid filter action value.");
+			MLXMLPluginInfo* info = xmlit.value().xmlInfo;
+			if (filterAction == NULL)
+				throw MLException("Invalid filter info value.");
+			QString filterName = xmlit.key();
+
+			QString help = info->filterHelp(filterName);
+			filterAction->setToolTip(help + getDecoratedFileName(filterAction->data().toString()));
+			connect(filterAction, SIGNAL(triggered()), this, SLOT(startFilter()));
+			QString filterClasses = info->filterAttribute(filterName, MLXMLElNames::filterClass);
+			QStringList filterClassesList = filterClasses.split(QRegExp("\\W+"), QString::SkipEmptyParts);
+			foreach(QString nameClass, filterClassesList)
+			{			
+				if (nameClass == QString("RPDSelection"))
+				{
+					RPDMenuSelect->addAction(filterAction);
+				}
+				if (nameClass == QString("RPDGL"))
+				{
+					RPDMenuGL->addAction(filterAction);
+				}
+				if (nameClass == QString("RPDAOL"))
+				{
+					RPDMenuAOL->addAction(filterAction);
+				}
+				if (nameClass == QString("RPDOR"))
+				{
+					RPDMenuOR->addAction(filterAction);
+				}
+				if (nameClass == QString("RPDDebug"))
+				{
+					RPDMenuDebug->addAction(filterAction);
+				}
+				
 				//  //  MeshFilterInterface::Generic :
 				if (nameClass == QString("Generic"))
 				{

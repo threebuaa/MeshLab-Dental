@@ -62,32 +62,32 @@ SelectionFilterPlugin::SelectionFilterPlugin()
       if(tt==FP_SELECT_DELETE_VERT){
             actionList.last()->setShortcut(QKeySequence ("Ctrl+Del"));
             actionList.last()->setIcon(QIcon(":/images/delete_vert.png"));
-			actionList.last()->setPriority(QAction::HighPriority);
+			actionList.last()->setPriority(QAction::LowPriority);
       }
       if(tt==FP_SELECT_DELETE_FACE){
             actionList.last()->setShortcut(QKeySequence (Qt::Key_Delete));
             actionList.last()->setIcon(QIcon(":/images/delete_face.png"));
-			actionList.last()->setPriority(QAction::HighPriority);
+			actionList.last()->setPriority(QAction::LowPriority);
       }
       if(tt==FP_SELECT_DELETE_FACEVERT){
             actionList.last()->setShortcut(QKeySequence ("Shift+Del"));
             actionList.last()->setIcon(QIcon(":/images/delete_facevert.png"));
-			actionList.last()->setPriority(QAction::HighPriority);
+			actionList.last()->setPriority(QAction::LowPriority);
       }
 	  if (tt == FP_SELECT_ALL){
 		  actionList.last()->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_A);
 		  actionList.last()->setIcon(QIcon(":/images/sel_all.png"));
-		  actionList.last()->setPriority(QAction::LowPriority);
+		  actionList.last()->setPriority(QAction::HighPriority);
 	  }
 	  if (tt == FP_SELECT_NONE){
 		  actionList.last()->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_D);
 		  actionList.last()->setIcon(QIcon(":/images/sel_none.png"));
-		  actionList.last()->setPriority(QAction::LowPriority);
+		  actionList.last()->setPriority(QAction::HighPriority);
 	  }
 	  if (tt == FP_SELECT_INVERT){
 		  actionList.last()->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_I);
 		  actionList.last()->setIcon(QIcon(":/images/sel_inv.png"));
-		  actionList.last()->setPriority(QAction::LowPriority);
+		  actionList.last()->setPriority(QAction::HighPriority);
 	  }
 	  if (tt == FP_SELECT_DILATE){
 		  actionList.last()->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_Plus);
@@ -129,6 +129,7 @@ SelectionFilterPlugin::SelectionFilterPlugin()
   }
   return QString("Unknown filter");
 }
+
  QString SelectionFilterPlugin::filterInfo(FilterIDType filterId) const
  {
    switch(filterId)
@@ -243,7 +244,7 @@ void SelectionFilterPlugin::initParameterSet(QAction *action, MeshModel &m, Rich
             case FP_SELECT_NONE:
             {
                  parlst.addParam(new RichBool("allFaces", true, "De-select all Faces", "If true the filter will de-select all the faces."));
-                 parlst.addParam(new RichBool("allVerts", true, "De-select all Vertices", "If true the filter will de-select all the vertices."));
+              	 parlst.addParam(new RichBool("allVerts", true, "De-select all Vertices", "If true the filter will de-select all the vertices."));
             }
             break;
             case FP_SELECT_INVERT:
@@ -468,22 +469,30 @@ bool SelectionFilterPlugin::applyFilter(QAction *action, MeshDocument &md, RichP
 
 MeshFilterInterface::FilterClass SelectionFilterPlugin::getClass(QAction *action)
 {
-  switch(ID(action))
-  {
-  case   CP_SELFINTERSECT_SELECT:
-  case   CP_SELECT_NON_MANIFOLD_VERTEX:
-  case   CP_SELECT_NON_MANIFOLD_FACE:
-    return FilterClass(MeshFilterInterface::Selection + MeshFilterInterface::Cleaning);;
-
-  case CP_SELECT_TEXBORDER : return FilterClass(MeshFilterInterface::Selection + MeshFilterInterface::Texture);
-  case FP_SELECT_BY_COLOR : return FilterClass(MeshFilterInterface::Selection);
-  case FP_SELECT_BY_FACE_QUALITY :
-  case FP_SELECT_BY_VERT_QUALITY : return FilterClass(MeshFilterInterface::Selection + MeshFilterInterface::Quality);
-  case FP_SELECTBYANGLE :
-    return MeshFilterInterface::FilterClass(MeshFilterInterface::RangeMap + MeshFilterInterface::Selection);
-
-  }
-  return MeshFilterInterface::Selection;
+	switch(ID(action))
+	{
+	case CP_SELFINTERSECT_SELECT:
+	case CP_SELECT_NON_MANIFOLD_VERTEX:
+	case CP_SELECT_NON_MANIFOLD_FACE:
+		return FilterClass(MeshFilterInterface::Selection + MeshFilterInterface::Cleaning);
+	case CP_SELECT_TEXBORDER :
+		return FilterClass(MeshFilterInterface::Selection + MeshFilterInterface::Texture);	
+	case FP_SELECT_BY_FACE_QUALITY :
+	case FP_SELECT_BY_VERT_QUALITY :
+		return FilterClass(MeshFilterInterface::Selection + MeshFilterInterface::Quality);
+	case FP_SELECTBYANGLE :
+		return FilterClass(MeshFilterInterface::Selection + MeshFilterInterface::RangeMap);
+	///20180816 Added for RPD
+	case   FP_SELECT_ALL:
+	case   FP_SELECT_NONE:
+	case   FP_SELECT_INVERT:
+	case   FP_SELECT_ERODE:
+	case   FP_SELECT_DILATE:
+	case   FP_SELECT_VERT_FROM_FACE:
+		return FilterClass(MeshFilterInterface::Selection + MeshFilterInterface::RPDSelection);
+	///by Wang
+	}
+	return MeshFilterInterface::Selection;  
 }
 
  int SelectionFilterPlugin::getRequirements(QAction *action)
@@ -504,7 +513,7 @@ int SelectionFilterPlugin::postCondition(QAction *action) const
 {
   switch(ID(action))
   {
-      case FP_SELECT_ALL:
+      case FP_SELECT_ALL:	  
       case FP_SELECT_FACE_FROM_VERT:
       case FP_SELECT_VERT_FROM_FACE:
       case FP_SELECT_NONE:

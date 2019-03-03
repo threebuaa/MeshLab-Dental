@@ -209,6 +209,29 @@ static void VertexFromMeanCurvatureDir(MeshType &m)
         (*vi).Q() = ((*vi).K1()+(*vi).K2())/2.0f;
 }
 
+static void VertexFromK1CurvatureDir(MeshType &m)
+{
+	tri::RequirePerVertexQuality(m);
+	tri::RequirePerVertexCurvatureDir(m);
+	for (VertexIterator vi = m.vert.begin(); vi != m.vert.end(); ++vi) if (!(*vi).IsD())
+		(*vi).Q() = (*vi).K1();
+}
+
+static void VertexFromK2CurvatureDir(MeshType &m)
+{
+	tri::RequirePerVertexQuality(m);
+	tri::RequirePerVertexCurvatureDir(m);
+	for (VertexIterator vi = m.vert.begin(); vi != m.vert.end(); ++vi) if (!(*vi).IsD())
+		(*vi).Q() = (*vi).K2();
+}
+
+static void VertexFromShapeIndexDir(MeshType &m)
+{
+	tri::RequirePerVertexQuality(m);
+	tri::RequirePerVertexCurvatureDir(m);
+	for (VertexIterator vi = m.vert.begin(); vi != m.vert.end(); ++vi) if (!(*vi).IsD())
+		(*vi).Q() = 2*atan(((*vi).K1()+ (*vi).K2())/ ((*vi).K1() - (*vi).K2()))/M_PI;
+}
 /*
  *  Absolute Curvature
  *
@@ -230,11 +253,13 @@ static void VertexFromAbsoluteCurvature(MeshType &m)
     VertexIterator vi;
     for(vi=m.vert.begin();vi!=m.vert.end();++vi) if(!(*vi).IsD())
     {
-        if((*vi).Kg() >= 0)
+      /*if((*vi).Kg() >= 0)
                     (*vi).Q() = math::Abs( 2*(*vi).Kh() );
         else
               (*vi).Q() = 2*math::Sqrt(math::Abs( (*vi).Kh()*(*vi).Kh() - (*vi).Kg()));
-    }
+	  */
+		(*vi).Q() = math::Abs((*vi).K1()) + math::Abs((*vi).K2());
+	}
 }
 
 /*

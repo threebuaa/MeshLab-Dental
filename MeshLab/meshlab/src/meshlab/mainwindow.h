@@ -269,6 +269,7 @@ private:
     void fillDecorateMenu();
     void fillRenderMenu();
     void fillEditMenu();
+	void fillRPDMenu();
     void createToolBars();
     void loadMeshLabSettings();
     // void loadPlugins();
@@ -411,13 +412,20 @@ private:
     QMenu *filterMenuSampling;
     QMenu *filterMenuTexture;
     QMenu *filterMenuCamera;
-	QMenu *filterMenuDenture;
-
+	
     QMenu *editMenu;
 
     //Render Menu and SubMenu ////
     QMenu *shadersMenu;
     QMenu *renderMenu;
+
+	//Removable partial denture Menu ////
+	QMenu *RPDMenu;
+	QMenu *RPDMenuSelect;
+	QMenu *RPDMenuGL;
+	QMenu *RPDMenuAOL;
+	QMenu *RPDMenuOR;
+	QMenu *RPDMenuDebug;
 
     //View Menu and SubMenu //////
     QMenu *viewMenu;

@@ -312,8 +312,15 @@ void MainWindow::updateSubFiltersMenu( const bool createmenuenabled,const bool v
     updateMenuItems(filterMenuTexture,validmeshdoc);
     filterMenuCamera->setEnabled(validmeshdoc);
     updateMenuItems(filterMenuCamera,validmeshdoc);
-	filterMenuDenture->setEnabled(validmeshdoc);
-	updateMenuItems(filterMenuDenture, validmeshdoc);
+	RPDMenuSelect->setEnabled(validmeshdoc);
+	updateMenuItems(RPDMenuGL, validmeshdoc);
+	RPDMenuGL->setEnabled(validmeshdoc);
+	updateMenuItems(RPDMenuAOL, validmeshdoc);
+	RPDMenuAOL->setEnabled(validmeshdoc);
+	updateMenuItems(RPDMenuOR, validmeshdoc);
+	RPDMenuOR->setEnabled(validmeshdoc);
+	updateMenuItems(RPDMenuDebug, validmeshdoc);
+	RPDMenuDebug->setEnabled(validmeshdoc);
 
 }
 

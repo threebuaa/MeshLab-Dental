@@ -69,7 +69,7 @@ public:
     typedef typename MeshType::VertContainer VertContainer;
     typedef typename MeshType::VertexType VertexType;
     typedef typename MeshType::VertexPointer VertexPointer;
-        typedef typename MeshType::VertexPointer VertexTypeP;
+    typedef typename MeshType::VertexPointer VertexTypeP;
     typedef vcg::face::VFIterator<FaceType> VFIteratorType;
     typedef typename MeshType::CoordType CoordType;
     typedef typename CoordType::ScalarType ScalarType;
@@ -304,7 +304,7 @@ class Quadric
                 (*vi).PD2().Import(v1global);
                 (*vi).K1()  = c_val[1];
                 (*vi).K2()  = c_val[0];
-            }
+            }			
             // ---- end Eigen stuff
         }
     }

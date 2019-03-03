@@ -77,3 +77,4 @@ SUBDIRS       = common \
                 sampleplugins/sampleedit \
                 sampleplugins/samplefilter \
                 sampleplugins/samplefilterdyn \     
+    plugins_experimental/filter_RPD
