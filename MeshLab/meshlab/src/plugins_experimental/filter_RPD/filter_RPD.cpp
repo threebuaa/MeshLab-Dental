@@ -330,7 +330,7 @@ bool FilterRPD::applyFilter(QAction *filter, MeshDocument &md, RichParameterSet 
 				Tparent[i].mark = ComputeMark(i);
 			}
 		}	
-		//标志
+		//标志		
 		for (vi = m.cm.vert.begin(); vi != m.cm.vert.end(); ++vi) {
 			if (!vi->IsGL()) {
 				int cmark;
@@ -342,20 +342,16 @@ bool FilterRPD::applyFilter(QAction *filter, MeshDocument &md, RichParameterSet 
 						break;
 					}
 				}
-				if (cmark > 0)
-				{
-					int a = 0;
-				}
 				TMark.push_back(pair<CVertexO*, int>(&(*vi), cmark));
 			}
 			else
 			{
-				TMark.push_back(pair<CVertexO*, int>(&(*vi), 0));
+				glTMark.push_back(pair<CVertexO*, int>(&(*vi), 0));
 			}
 		}
 		//线化
 		int change = 0;
-		vector<CVertexO *> delglp;
+		vector<CVertexO *> delglp;		
 		do {
 			change = 0;
 			delglp.clear();
@@ -368,9 +364,9 @@ bool FilterRPD::applyFilter(QAction *filter, MeshDocument &md, RichParameterSet 
 					vi->ClearV();
 					for (int i = 0; i < OneRing.allV.size(); i++) {
 						if (!OneRing.allV.at(i)->IsGL())
-							tpmark |= getTMark(OneRing.allV.at(i));
+							tpmark |= getTMark(TMark, OneRing.allV.at(i));//不属于GL的放在Tmark
 					}
-					setTMark(&(*vi), tpmark);
+					setTMark(glTMark, &(*vi), tpmark);//属于GL的放在glTmark
 					if (countBit(tpmark) == 1) {
 						delglp.push_back(&(*vi));
 					}
@@ -383,16 +379,31 @@ bool FilterRPD::applyFilter(QAction *filter, MeshDocument &md, RichParameterSet 
 				OneRing.insertAndFlag1Ring(&(*delglp[i]));
 				delglp[i]->ClearV();
 				for (int i = 0; i < OneRing.allV.size(); i++) {
-					tpmark |= getTMark(OneRing.allV.at(i));
+					if (OneRing.allV.at(i)->IsGL())
+					{
+						tpmark |= getTMark(glTMark, OneRing.allV.at(i));
+					}
+					else
+					{
+						tpmark |= getTMark(TMark, OneRing.allV.at(i));
+					}
+					
 				}
-				if (tpmark == getTMark(delglp[i])) {
+				if (tpmark == getTMark(glTMark, delglp[i]) && countBit(tpmark) == 1) {
 					delglp[i]->ClearGL();
 					delglp[i]->C() = vcg::Color4b::White;
+					transTMark(delglp[i]);
 					change = 1;
 				}				
-			}
+			}			
 		} while (change != 0);
-
+		for (vi = m.cm.vert.begin(); vi != m.cm.vert.end(); ++vi) {
+			if (vi->IsGL() && getTMark(glTMark, &(*vi)) == 1) {
+				vi->ClearGL();
+				vi->C() = vcg::Color4b::White;
+				transTMark(&(*vi));
+			}
+		}
 	}break;
 	case FP_RPD_EXPORT:
 	{
@@ -673,17 +684,17 @@ int FilterRPD::ComputeMark(int a) {
 	return{ 1 << a };
 }
 
-int FilterRPD::getTMark(CVertexO *vi) {
-	for (int i = 0; i < TMark.size(); i++) {
-		if (vi == TMark[i].first)
-			return TMark[i].second;
+int FilterRPD::getTMark(vector< pair<CVertexO *, int> >& Mark, CVertexO *vi) {
+	for (int i = 0; i < Mark.size(); i++) {
+		if (vi == Mark[i].first)
+			return Mark[i].second;
 	}
 }
 
-void FilterRPD::setTMark(CVertexO *vi,int a) {
-	for (int i = 0; i < TMark.size(); i++) {
-		if (vi == TMark[i].first)
-			TMark[i].second = a;
+void FilterRPD::setTMark(vector<pair<CVertexO*, int>>& Mark, CVertexO * vi, int a) {
+	for (int i = 0; i < Mark.size(); i++) {
+		if (vi == Mark[i].first)
+			Mark[i].second = a;
 	}
 }
 
@@ -694,6 +705,17 @@ int FilterRPD::countBit(int num) {
 		count++;
 	}
 	return count;
+}
+
+void FilterRPD::transTMark(CVertexO *vi) {
+	for (int i = 0; i < glTMark.size(); i++) {
+		if (vi == glTMark[i].first)
+		{
+			TMark.push_back(pair<CVertexO*, int>(&(*vi), glTMark[i].second));
+			glTMark.erase(glTMark.begin() + i);
+			return;
+		}
+	}
 }
 
 MESHLAB_PLUGIN_NAME_EXPORTER(FilterRPD)

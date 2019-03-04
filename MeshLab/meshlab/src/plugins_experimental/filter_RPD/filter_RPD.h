@@ -82,13 +82,15 @@ private:
 	void ARAreaDilate(MeshModel &, int );
 	void ARAreaClean(MeshModel &, RichParameterSet &);
 	int ComputeMark(int a);
-	int getTMark(CVertexO *);
-	void setTMark(CVertexO *vi,int a);
+	int getTMark(vector<pair<CVertexO*, int>>& Mark, CVertexO * vi);
+	void setTMark(vector<pair<CVertexO*, int>>& Mark, CVertexO * vi,int a);
 	int countBit(int num);
+	void transTMark(CVertexO * vi);
 public:
 	CMeshO::PerVertexAttributeHandle<float> QCopy;
 	///顶点标志向量
 	vector< pair<CVertexO *, int> > TMark;
+	vector< pair<CVertexO *, int> > glTMark;
 	///单牙父节点集
 	vector<Teeth> Tparent;
 
